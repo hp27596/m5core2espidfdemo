@@ -1,4 +1,3 @@
-// #include "esp_chip_info.h"
 #include <M5Unified.h>
 #include <stdio.h>
 #include <freertos/FreeRTOS.h>
