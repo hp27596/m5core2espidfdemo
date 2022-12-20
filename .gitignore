@@ -1,3 +1,4 @@
 .pio
 .clang_complete
 .ccls
+compile_commands.json
