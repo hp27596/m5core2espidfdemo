@@ -9,15 +9,6 @@
 #define LV_TICK_PERIOD_MS 1
 #define INFO_TAG "Info"
 
-void print_inf() {
-    M5.Display.printf("AC In curr: %.02fmA\n", M5.Power.Axp192.getACINCurrent());
-    M5.Display.printf("AC In volt: %.02fV\n", M5.Power.Axp192.getACINVolatge());
-    // M5.Display.printf("Bat: %.02f\n", M5.Power.Axp192.getBatteryPower());
-    M5.Display.printf("Bat volt: %.02fV\n", M5.Power.Axp192.getBatteryVoltage());
-    M5.Display.printf("Bat discharge curr: %.02fmA\n", M5.Power.Axp192.getBatteryDischargeCurrent());
-    M5.Display.printf("Temp: %.01f\n", M5.Power.Axp192.getInternalTemperature());
-}
-
 void display_info(bool refr = false) {
     static int prev_battery = INT_MAX;
     int battery = M5.Power.getBatteryLevel();
@@ -33,18 +24,29 @@ void display_info(bool refr = false) {
         M5.Display.print("Bat:");
 
         if (battery >= 0) {
-            if (battery == 100) {
-                M5.Display.printf("%03d\n", battery);
-            } else {
-                M5.Display.printf("%02d\n", battery);
-            }
+            M5.Display.printf("%02d\n", battery);
         } else {
             M5.Display.print("No battery");
         }
         M5.Display.endWrite();
 
-        print_inf();
     }
+}
+
+void reset_scr() {
+    M5.Display.clearDisplay();
+    M5.Display.setCursor(1,0);
+    display_info(true);
+}
+
+void print_inf() {
+    reset_scr();
+    M5.Display.printf("AC In curr: %.02fmA\n", M5.Power.Axp192.getACINCurrent());
+    M5.Display.printf("AC In volt: %.02fV\n", M5.Power.Axp192.getACINVolatge());
+    // M5.Display.printf("Bat: %.02f\n", M5.Power.Axp192.getBatteryPower());
+    M5.Display.printf("Bat volt: %.02fV\n", M5.Power.Axp192.getBatteryVoltage());
+    M5.Display.printf("Bat discharge curr: %.02fmA\n", M5.Power.Axp192.getBatteryDischargeCurrent());
+    M5.Display.printf("Temp: %.01f\n", M5.Power.Axp192.getInternalTemperature());
 }
 
 void button_ctrl(void *pvParameter) {
@@ -57,17 +59,15 @@ void button_ctrl(void *pvParameter) {
         }
 
         if (M5.BtnB.wasPressed()) {
-            M5.Display.println("BtnB pressed");
-            ESP_LOGI(INFO_TAG, "%d\n", M5.BtnB.wasPressed());
-            M5.Display.clearDisplay();
-            M5.Display.setCursor(1,0);
-            display_info(true);
+            M5.Display.println("Clearning screen...");
+            vTaskDelay(300);
+            reset_scr();
         }
 
         if (M5.BtnC.wasPressed()) {
-            M5.Display.println("BtnC pressed");
+            M5.Display.println("Printing Power Info...");
             ESP_LOGI(INFO_TAG, "%d\n", M5.BtnC.wasPressed());
-            M5.Power.setLed(1);
+            print_inf();
         }
 
         if (M5.BtnPWR.wasClicked()) {
